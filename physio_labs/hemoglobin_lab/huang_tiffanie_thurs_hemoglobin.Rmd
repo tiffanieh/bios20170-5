@@ -1,0 +1,478 @@
+---
+title: "Hemoglobin Modeling Lab"
+author: "Tiffanie Huang"
+date: '2022-11-10'
+output: html_document
+---
+
+```{r}
+exp <- read.csv("/Users/tiffanie/Downloads/Hb modeling data files/Experimental_Data.csv")
+temp = read.csv("/Users/tiffanie/Downloads/bio modeling lab/Temp_data_ExpF22.csv")
+
+t_po2_32 <- temp$data_pO2_32
+t_y_32 <- temp$data_Y_32
+
+t_po2_35 <- temp$data_pO2_35
+t_y_35 <- temp$data_Y_35
+
+t_po2_38 <- temp$data_pO2_38
+t_y_38 <- temp$data_Y_38
+
+t_po2_41 <- temp$data_pO2_41
+t_y_41 <- temp$data_Y_41
+
+t_po2_44 <- temp$data_pO2_44
+t_y_44 <- temp$data_Y_44
+
+t_po2_47 <- temp$data_pO2_47
+t_y_47 <- temp$data_Y_47
+
+t_po2_52 <- temp$data_pO2_52
+t_y_52 <- temp$data_Y_52
+
+exp_po2 <- exp$data_pO2 
+exp_y <- exp$data_Y
+
+exp_data <- data.frame(x=exp_po2, y=exp_y)
+
+t32 <- data.frame(x=t_po2_32, y=(t_y_32/100))
+t35 <- data.frame(x=t_po2_35, y=(t_y_35/100))
+t38 <- data.frame(x=t_po2_38, y=(t_y_38/100))
+t41 <- data.frame(x=t_po2_41, y=(t_y_41/100))
+t44 <- data.frame(x=t_po2_44, y=(t_y_44/100))
+t47 <- data.frame(x=t_po2_47, y=(t_y_47/100))
+t52 <- data.frame(x=t_po2_52, y=(t_y_52/100))
+```
+
+
+```{r}
+
+ib <- function(){
+  y <- ((po2*k)+3*((po2^2)*(k^2))+3*((po2^3)*(k^3))+((po2^4)*(k^4)))/(1+4*(po2*k)+6*((po2^2)*(k^2))+4*((po2^3)*(k^3))+((po2^4)*(k^4)))
+   return(y)
+}
+
+po2 <- seq(0, 110, 0.01)
+k <- 1/12
+
+ib_sim <- ib()
+plot(po2, ib_sim, xlab="PO2 values (torr)", ylab="fraction of total hemoglobin bound", main="Fraction of total hemoglobin bound vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(exp_po2,(exp_y/100), col=c(2),type="l")
+
+legend("bottomright", legend=c("simulation - Ind Bind","experimental" ), fill=c(1,2), cex=0.8)
+
+#1. The simulation line is a hyperbolic curve, while the experimental plot shows a sigmoidal curve. 
+
+```
+
+
+```{r}
+
+#2.
+
+ib <- function(po2, k){
+  y <- ((po2*k)+3*((po2^2)*(k^2))+3*((po2^3)*(k^3))+((po2^4)*(k^4)))/(1+4*(po2*k)+6*((po2^2)*(k^2))+4*((po2^3)*(k^3))+((po2^4)*(k^4)))
+   return(y)
+}
+
+po2_values <- seq(0, 110, 0.01)
+k_1 <- c(1/5,1/12,1/25,1/50)
+
+
+plot(exp_po2,(exp_y/100), xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+abline(h=0.5, lty=2)
+
+
+for(i in 1:length(k_1)){
+  ib_sim <- ib(po2_values, k_1[i])
+  lines(po2_values,ib_sim,col=c(i+1))
+}
+
+
+legend("bottomright", legend=c("experimental", "simulation k=1/5", "simulation k=1/12","simulation k=1/25", "simulation k=1/50" ), fill=c(1:5), cex=0.8, title="ind bind simulation k value + experimental curve")
+
+
+#3. The "best" K would be the smallest K value I tried, where k=1/50. WHen k=1/50, the fraction of oxygenated hemoglobin for the simulation curve and the experimental curve are the same. However, I don't think our model for independent binding accurately dispplays the characteristics of experimental data, as it plots a hyperbolic curve versus the experimental sigmoidal curve, meaning O2 binding in hemoglobin is not independent. This is because of hemoglobin's cooperativity, where the binding of one O2 molecule to one hemoglobin molecule will affect how easily the next one binds. 
+
+```
+```{r}
+sb <- function(){
+  y1 <- (po2^4)/(po2^4+p50^4)
+   return(y1)
+}
+
+po2 <- po2_values
+p50 <- 46
+
+exp_po2 <- exp$data_pO2 
+exp_y <- exp$data_Y
+
+
+sb_sim <- sb()
+
+sb_sim <- sb()
+plot(po2, sb_sim, xlab="PO2 values (torr)", ylab="fraction of total hemoglobin bound", main="Fraction of total hemoglobin bound vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(exp_po2,(exp_y/100), col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("simulation -- simult bind","experimental"), fill=c(1,2), cex=0.8)
+
+#4. The two curves are now very similar in that they have nearly identical p50 values and are both sigmoidal to the same degree, rather than the simulation curve being hyperbolic. 
+```
+```{r}
+#5.My best fit P50 is p50=46.
+
+sb <- function(po2, p50){
+  y1 <- (po2^4)/(po2^4+p50^4)
+   return(y1)
+}
+
+p50_1 <- c(30, 46, 50, 75)
+
+plot(exp_po2,(exp_y/100), xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+abline(h=0.5, lty=2)
+
+for(i in 1:length(p50_1)){
+  sb_sim <- sb(po2_values, p50_1[i])
+  lines(po2_values,sb_sim,col=c(i+1))
+}
+
+legend("bottomright", legend=c("experimental", "p50=30", "p50=46","p50=50", "p50=75" ), fill=c(1:5), cex=0.8, title="simulation p50")
+
+#6. The shape of my plot with the "best" fit P50 is sigmoidal. I don't think O2 binding in hemoglobin is simultaenous, as none of the simulation curves perfectly match up with our experimental curve.
+```
+
+```{r}
+
+hill <- function(){
+  y2 <- (po2^n)/(po2^n+p50^n)
+   return(y2)
+}
+
+po2 <- po2_values
+n <- 4
+p50 <- 46
+
+
+
+exp_po2 <- exp$data_pO2 
+exp_y <- exp$data_Y
+
+
+hill_sim <- hill()
+plot(po2, hill_sim, xlab="PO2 values (torr)", ylab="fraction of total hemoglobin bound", main="Fraction of total hemoglobin bound vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(exp_po2,(exp_y/100), col=c(2),type="l")
+
+legend("bottomright", legend=c("simulation - coop bind","experimental"), fill=c(1,2), cex=0.8)
+
+
+
+#7. I can see sigmoidal curves for both of them and a very similar p50 value. However, the simulation is still slightly steeper than experimental, so it's not a perfect fit.
+
+```
+```{r}
+
+#8. The "best" n would be n=3.5.
+
+
+hill <- function(po2, p50, n){
+  y2 <- (po2^n)/(po2^n+p50^n)
+   return(y2)
+}
+
+n_1 <- seq(3,4.5,0.5)
+
+plot(exp_po2,(exp_y/100), xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+abline(h=0.5, lty=2)
+
+for(i in 1:length(n_1)){
+  hill_sim <- hill(po2_values, p50, n_1[i])
+  lines(po2_values,hill_sim,col=c(i+1))
+}
+
+legend("bottomright", legend=c("experimental", "n=3.0", "n=3.5","n=4.0", "n=4.5" ), fill=c(1:5), cex=0.8, title="cooperative simulation n-value")
+
+#9. The shape of my plot with the "best" fit n (3.5) is sigmoidal. I think O2 binding in hemoglobin is cooperative, as we can see that the curves are much closer to the experimental curve, just varying by steepness a bit -- especially b/c they all have the same p50 value in my graph. 
+
+```
+
+```{r}
+
+#10.
+
+#32°C
+
+temp_hill_32 <- hill(po2_values, 41, 3.5)
+plot(t32, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_32, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=32°C exp", "hill - n=3.5, p50=41" ), fill=c(1,2), cex=0.8)
+
+
+
+```
+```{r}
+
+#35°C
+
+temp_hill_35 <- hill(po2_values, 40, 3.5)
+plot(t35, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_35, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=35°C exp", "hill - n=3.5, p50=40" ), fill=c(1,2), cex=0.8)
+
+
+
+```
+```{r}
+
+#38°C
+
+temp_hill_38 <- hill(po2_values, 42, 3.5)
+plot(t38, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_38, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=38°C exp", "hill - n=3.5, p50=42" ), fill=c(1,2), cex=0.8)
+
+
+
+```
+
+```{r}
+
+#41°C
+
+temp_hill_41 <- hill(po2_values, 45, 3.5)
+plot(t41, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_41, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=41°C exp", "hill - n=3.5, p50=45" ), fill=c(1,2), cex=0.8)
+
+
+
+```
+```{r}
+
+#44°C
+
+temp_hill_44 <- hill(po2_values, 50, 3.5)
+plot(t44, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_44, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=44°C exp", "hill - n=3.5, p50=50" ), fill=c(1,2), cex=0.8)
+
+
+```
+
+
+```{r}
+
+#47°C
+
+temp_hill_47 <- hill(po2_values, 49, 5.3)
+plot(t47, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_47, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=47°C exp", "hill - n=5.3, p50=49" ), fill=c(1,2), cex=0.8)
+
+
+```
+
+
+```{r}
+
+#52°C
+
+temp_hill_52 <- hill(po2_values, 56, 2.2)
+plot(t52, xlab="PO2 values (torr)", ylab="fraction of oxygenated hemoglobin", main="Fraction of oxygenated hemoglobin vs Po2 values (torr)", col=c(1), xlim=c(0,110),ylim=c(0,1), type="l")
+lines(po2_values, temp_hill_52, col=c(2),type="l")
+abline(h=0.5, lty=2)
+
+legend("bottomright", legend=c("T=52°C exp", "hill - n=2.2, p50=56"), fill=c(1,2), cex=0.8)
+
+
+```
+
+
+```{r}
+#11.
+
+p50_temp <- c(41,40,42,45,50,49,56)
+n_temp <- c(3.5,3.5,3.5,3.5,3.5,4.5,2.2)
+temp_values <- c(32,35,38,41,44,47,52)
+
+```
+
+```{r}
+#12-14.
+
+#p50 vs temp
+
+plot(temp_values, p50_temp, xlab="temperature (°C)", ylab="p50 values (torr)", main="p50 values (torr) vs temp (°C)", col=c(1))
+
+fit_p50vsT <- lm(p50_temp~temp_values)
+intercept_p50vsT <- fit_p50vsT$coefficients[[1]]
+slope_p50vsT <- fit_p50vsT$coefficients[[2]]
+r2_p50vsT <- summary(fit_p50vsT)$r.squared
+r_p50vsT <- sqrt(r2_p50vsT)
+
+abline(fit_p50vsT, col=c(2))
+
+if(slope_p50vsT < 0){ #neg relationship + cor coeff
+  cc_p50vsT <- (-1)*r_p50vsT
+} else{ #pos relationship + cor coeff
+  cc_p50vsT <- r_p50vsT
+}
+
+paste("slope:",slope_p50vsT,",","intercept:", intercept_p50vsT,",","r^2:",r2_p50vsT,",","correlation coefficient:",cc_p50vsT)
+
+```
+```{r}
+#12-14 (cont).
+
+#n vs temp
+
+plot(temp_values, n_temp, xlab="temperature (°C)", ylab="n values", main="n values vs temp (°C)", col=c(1))
+
+fit_nvsT <- lm(n_temp~temp_values)
+intercept_nvsT <- fit_nvsT$coefficients[[1]]
+slope_nvsT <- fit_nvsT$coefficients[[2]]
+r2_nvsT <- summary(fit_nvsT)$r.squared
+r_nvsT <- sqrt(r2_nvsT)
+
+abline(fit_nvsT, col=c(3))
+
+if(slope_nvsT < 0){ #pos relationship + cor coeff
+  cc_nvsT <- (-1)*r_nvsT
+} else{ #neg relationship + cor coeff
+  cc_nvsT <- r_nvsT
+}
+
+paste("slope:",slope_nvsT,",","intercept:", intercept_nvsT,",","r^2:",r2_nvsT,",","correlation coefficient:",cc_nvsT)
+
+```
+
+
+```{r}
+#13 (cont).
+
+#If n and p50 have a linear relationship with temperature, it would mean that they change at a constant rate as temperature increases, a straight-line relationship between these 2 variables that can be negative or positive. 
+
+#For p50, we can see that there is a strong positive linear relationship between p50 and temperature,which we can see in the correlation coefficient of 0.957109944000543 (very close to perfect positive correlation of +1). This indicates that generally as temperature increases, p50 also increases at a moderately constant rate.
+
+#If "n" vs temperature had a linear relationship we would think that there exists a negative relationship given the slope of the linear fit line -- a very slight negative slope of -0.0281862745098038. However, looking at the  correlation coefficient of -0.294081677964643, we can see that there isn't a strong negative relationship between these two variables. This is b/c out of our 7 observations for n vs temp, 5 of the temperatures have the same n value of 3.5, while the other 2 values have a very extreme value. This means that the steepness/nature of the sigmoid curve should not vary with temperature. 
+
+```
+
+
+```{r}
+#15. #plot p50 vs pH
+
+data_pH <- c(7.61, 7.36, 7.15, 6.92)
+data_p50 <- c(19.1, 23.4, 30.9, 40.7)
+
+plot(data_pH, data_p50, xlab="pH", ylab="p50 (torr)", main="p50 (torr) vs pH")
+
+```
+
+```{r}
+#16.This is a decent fit; it isn't perfect, but the correlation coefficient is -0.9816245, indicating a pretty strong negative linear relationship between pH and p50 in our experimental data.
+
+
+plot(data_pH, data_p50, xlab="pH", ylab="p50 (torr)", main="p50 (torr) vs pH")
+
+fit_p50vspH <- lm(data_p50~data_pH)
+intercept_p50vspH <- fit_p50vspH$coefficients[[1]]
+slope_p50vspH <- fit_p50vspH$coefficients[[2]]
+r2_p50vspH <- summary(fit_p50vspH)$r.squared
+r_p50vspH <- sqrt(r2_p50vspH)
+
+abline(fit_p50vspH, col=c(2))
+
+if(slope_p50vspH < 0){ #pos relationship + cor coeff
+  cc_p50vspH <- (-1)*r_p50vspH
+} else{ #neg relationship + cor coeff
+  cc_p50vspH <- r_p50vspH
+}
+
+paste("slope:",slope_p50vspH,",","intercept:", intercept_p50vspH,",","r^2:",r2_p50vspH,",","correlation coefficient:",cc_p50vspH)
+
+```
+
+
+
+
+```{r}
+#17.solve hill equation for each pH
+
+p50_eqn <- function(pH){
+  y3 <- ((-31.5603382013834)*pH) + 257.653055342044
+    return(y3)
+}
+
+#step 1: define pH values
+data_pH <- c(7.61, 7.36, 7.15, 6.92)
+
+#step 2: solve for p50 based on slope-intercept equation from above
+
+pred_p50 <- numeric()
+for(i in 1:length(data_pH)){
+  pred_p50[i] <- p50_eqn(data_pH[i])
+}
+
+print(pred_p50) #solutions for p50 values
+
+po2_values_ext <- seq(0,160,0.01) #extend po2 range
+
+plot(0,0,type="n",xlim=c(0,160),ylim=c(0,1),xlab="PO2 values (torr)", ylab="fraction O2 saturation", main="fraction O2 saturation vs po2 (torr) w/ diff pH")
+abline(h=0.5, lty=2)
+
+#step 3: call hill() feeding in calculated p50 values
+
+#18. plot all curves corresponding to each pH on one graph
+
+for(i in 1:length(pred_p50)){
+  o2_sat <- hill(po2_values_ext, pred_p50[i], 2.8) #n=2.8, given n-value
+  lines(po2_values_ext,o2_sat,col=c(i)) 
+}
+
+legend("bottomright", legend=c(data_pH, "myoglobin curve"),fill=c(1:5),title="pH + myo curve", cex=0.8)
+
+#19. I see each curve is sigmoidal, and that as pH changes, so does p50 (as indicated by the horizontal line) as well as the placement of the overall curve. As pH decreases, p50 generally increases (we can see there is a ~22 torr increase between p50 values for pH of 7.61 vs the curve for pH=6.921). As pH decreases, we see the o2 saturation curve shift more and more right/get less steep, indicating  a decrease in oxygen affinity. This makes sense, as according to the Bohr effect, when tissues are more metabolically active, they produce more H+ ions --> lower pH --> allows for more O2 dissociation from hemoglobin to be used in the tissues that need it. This also explains the increase in p50 as pH decreases, which indicates lower oxygen affinity.
+
+#20. 
+
+abline(v=c(40,100), col=c("darkcyan","darkviolet"), lty=2)
+text(42, 0.2, "venous", srt=90, cex=0.8, col="darkcyan")
+text(102, 0.2, "arterial", srt=90, cex=0.8, col="darkviolet")
+
+#21. No -- pH does not have the same effect on Y in both locations. We can see that it affects Y more drastically in venous blood compared to arterial blood, as the differences between Y for different pH's (such as 7.6 vs 6.8) in venous blood are much larger than the differences between Y in arterial blood. For example, @40 torr (po2 value for venous blood) when pH=7.6 Y is 90.616% (0.90616 as a fraction), and when pH=6.8, Y is 44.882% (0.44882); this is a difference of 45.734% (0.45734). Compared to the small difference in Y (7.836% or 0.07836) @100 torr (po2 value for arterial blood) when pH goes from 7.6 to 6.8, there is a far larger difference in Y for venous blood. This shows that in venous blood, decreasing pH would lead to a drastic decrease in fraction of O2 saturation --> drastic decrease in oxygen affinity for hemoglobin. This greatly enhances the "unloading" of O2 from hemoglobin for venous blood, which makes sense b/c the veins carry deoxygenated blood from body to heart, so in accordance w/ the Haldane effect (oxygenated blood --> reduced affinity for CO2), deoxygenated blood in the veins can carry  more CO2 b/c of a higher affinity now that O2 is not displacing CO2 from hemoglobin. In arterial blood, decreasing pH would lead to a less drastic decrease in fraction of O2 saturation --> not as large of a decrease in oxygen affinity for hemoglobin --> only slightly enhances "unloading" of O2 from hemoglobin for arterial blood, not by much. This reflects how arteries are meant to carry oxygenated blood to tissues in the body, and thus, should not be pushed by decrease in pH / metabolic activity to unload oxygen as much.
+
+90.616-44.882
+99.21-91.374
+
+#22. myoglobin curve
+
+frMyo <- function(po2, p50){
+  ypo2 <- po2/(po2+p50)
+  return(ypo2)
+}
+
+y_myo <- frMyo(po2_values_ext,35.6)
+lines(po2_values_ext,y_myo,col=c(5))
+
+
+#23. While myoglobin's O2 saturation curve shows a hyperbolic curve, the hemoglobin curves at different pHs are all sigmoidal. We can see that myoglobin has a higher affinity for oxygen b/c it stores oxygen, releasing it if the muscle needs it; it shows a hyperbolic curve which reflects how myoglobin only has one heme group. On the other hand, hemoglobin is sigmoidal because of its cooperativity, which increases hemoglobin's affinity for oxygen after the first O2 molecule binds to a unit (hemoglobin is different in that it has 4 subunits), leading to the fraction O2 saturation increasing rapidly. Hemoglobin unloads O2 based on when tissues need oxygen / oxygen availability, which we can see in how the dissociation curve shifts/changes based on outside factors like temperature or pH. As hemoglobin releases O2, myoglobin picks it up + binds to it so that during exercise pH increases), the exercising muscles can have more O2 -- when pH is lower.
+```
+
+
+
+
+
+

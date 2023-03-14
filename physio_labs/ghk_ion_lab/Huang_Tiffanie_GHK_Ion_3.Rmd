@@ -1,0 +1,80 @@
+---
+title: "GHK Ion Lab Pt 3"
+author: "Tiffanie Huang"
+date: '2022-10-06'
+output: html_document
+---
+
+```{r}
+
+PNa <- seq(1,50,2)
+
+
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+ghk <- function(PNa, PK, PCl, Na0, K0, Cl0, Nai, Ki, Cli){
+  Erev <- ((R*Temp)/Fa)*log((((PNa*Na0)+(PK*K0)+(PCl*Cli))/((PNa*Nai)+(PK*Ki)+(PCl*Cl0))))
+  return(Erev)
+}
+ghk(PNa,20,5,460,10,540,50,400,100)
+
+mempot <- ghk(PNa,20,5,460,10,540,50,400,100)
+
+
+plot(PNa, mempot, xlab="Na+ permeability", ylab="membrane potential(V)", main="Membrane potential vs Na+ permeability",type="o")
+
+```
+
+
+```{r}
+
+P_Na <- seq(1,50,2)
+mempot <- ghk(P_Na,20,5,460,10,540,50,400,100)
+CURstate <- 0
+endtime <- 100
+state<-rep(0, endtime)
+
+
+for(t in mempot){
+  if(t> -0.02){
+  p <- 0.8
+  q <- 0.8
+  } else {
+  p <- 0.65
+  q <- 0.03
+  }
+  for(t in 1:endtime){
+  randomNum<-runif(1)  #runif(1) randomly generates a number between 0 and 1   
+  if(CURstate==1){
+    if(randomNum < p){
+      CURstate <- 1
+    }else{
+      CURstate <- 0
+    }
+  }else{
+    if(randomNum< q){
+      CURstate<-1
+    }else{
+      CURstate<- 0
+    }
+  }
+  state[t] <- CURstate
+  }
+  mean(state)
+  plot(1:endtime, state, xlab="Time", ylab="Ion Channel state", main="ion channel state over time", type="o")
+  abline(h=mean(state))
+  legend("topleft",bty="n",legend=paste("mean",mean(state)), text.col=c(2))
+}
+
+state
+
+#22. Overall, as the membrane potential gets more positive than the threshold value, the channel will be opened more often than it's closed, as when they are less than the threshold value -0.02 V, they will be closed more than they are open. For all the graphs, they  retain one state more often than the other.
+
+```
+
+
+
+
+

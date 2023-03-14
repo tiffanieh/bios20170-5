@@ -1,0 +1,82 @@
+---
+title: "Actin Pre-Lab W8"
+author: "Tiffanie Huang"
+output: html_document
+date: '2022-02-28'
+---
+
+```{r}
+# Tiffanie Huang
+
+rm(list=ls())
+
+# part i: read in & plot data for a range of profilin concentrations
+
+# handing experimental data
+profilin=read.csv("/Users/tiffanie/Desktop/actin prelab/Profilin_AssemblyCurves.csv")
+
+# colors
+cl=rainbow(11) 
+
+# plotting data
+plot(profilin[,1],profilin[,2],col=cl[1],xlab="time (s)",ylab="fluor",main="Profilin Curves",type="l")
+
+lines(profilin[,1],profilin[,3],col=cl[2],xlab="time",ylab="p0.5")
+  lines(profilin[,1],profilin[,4],col=cl[3],xlab="time",ylab="p1.0")
+    lines(profilin[,1],profilin[,5],col=cl[4],xlab="time",ylab="p2.0")
+      lines(profilin[,1],profilin[,6],col=cl[5],xlab="time",ylab="p3.0")
+lines(profilin[,1],profilin[,7],col=cl[6],xlab="time",ylab="p4.0")
+  lines(profilin[,1],profilin[,8],col=cl[7],xlab="time",ylab="p5.0")
+    lines(profilin[,1],profilin[,9],col=cl[8],xlab="time",ylab="p7.5")
+      lines(profilin[,1],profilin[,10],col=cl[9],xlab="time",ylab="p10.0")
+lines(profilin[,1],profilin[,11],col=cl[10],xlab="time",ylab="p12.5")
+  lines(profilin[,1],profilin[,12],col=cl[11],xlab="time",ylab="p15.0")
+  
+legend("topleft",legend=c("actin only","p0.5uM","p1.0uM","p2.0uM","p3.0uM","p4.0uM","p5.0uM","p7.5uM","p10.0uM","p12.5uM","p15.0uM"),col=cl,lwd=2)
+
+
+# for (i in 4:11) {
+# lines(profilin[,i],col=cl[1],xlab="time",ylab="fluor")}
+
+  
+
+
+```
+```{r}
+
+# Describe what you see. How do the assembly curves of actin assembly change based on changing the profilin concentration?
+# The curves get progressively less steep as the concentration of profilin increases, showing a decrease in the change of rate of fluorescence. All profilin curves are generally increasing, with the actin only curve (0.0uM profilin) increasing the most. Lower profilin concentrations means the actin has produces more fluorescence, polymerizing faster and assembling actin faster.
+
+
+```
+
+
+```{r}
+# part ii: linear portion of experimental curves
+
+# plotting data
+
+
+st<-50
+end<-90
+
+plot(profilin[st:end,1],profilin[st:end,2],col=cl[1],xlab="time (s)",ylab="fluor",main="Profilin Elongation Curves",type="l")
+
+lines(profilin[st:end,1],profilin[st:end,3],col=cl[2],xlab="time",ylab="p0.5")
+  lines(profilin[st:end,1],profilin[st:end,4],col=cl[3],xlab="time",ylab="p1.0")
+    lines(profilin[st:end,1],profilin[st:end,5],col=cl[4],xlab="time",ylab="p2.0")
+      lines(profilin[st:end,1],profilin[st:end,6],col=cl[5],xlab="time",ylab="p3.0")
+lines(profilin[st:end,1],profilin[st:end,7],col=cl[6],xlab="time",ylab="p4.0")
+  lines(profilin[st:end,1],profilin[st:end,8],col=cl[7],xlab="time",ylab="p5.0")
+    lines(profilin[st:end,1],profilin[st:end,9],col=cl[8],xlab="time",ylab="p7.5")
+      lines(profilin[st:end,1],profilin[st:end,10],col=cl[9],xlab="time",ylab="p10.0")
+lines(profilin[,1],profilin[,11],col=cl[10],xlab="time",ylab="p12.5")
+  lines(profilin[,1],profilin[,12],col=cl[11],xlab="time",ylab="p15.0")
+  
+legend("topleft",legend=c("actin only","p0.5uM","p1.0uM","p2.0uM","p3.0uM","p4.0uM","p5.0uM","p7.5uM","p10.0uM","p12.5uM","p15.0uM"),col=cl,lwd=1)
+
+
+```
+```{r}
+# Describe what you see.
+# I can see that while all the curves are generally increasing in fluorescence over time, the more concentrated they are, the less of an increase is present. Again, the curve for actin only (0.0uM profilin) displays the highest rate of change in fluorescence production. This shows that the assembly rate during elongation is higher for actin only, and it only slows down as the concentration of profilin is increased. 

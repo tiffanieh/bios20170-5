@@ -1,0 +1,97 @@
+---
+title: "prelab notes"
+author: "Tiffanie Huang"
+date: '2022-11-10'
+output: html_document
+---
+```{r}
+#Tiffanie Huang
+```
+
+
+```{r}
+rm(list=ls())
+
+#this creates the function -- still need to call the function
+myo <- function(){
+  mbo <- a*x^2
+  return(mbo)
+}
+
+```
+
+
+```{r}
+
+a <- 5 #pH condition
+x <- seq(0,1,0.1)
+
+#call function w/ specific inputs
+
+myopH <- myo()
+
+
+#solve function w/ varying parameter values of a
+
+a1 <- c(1,5,22,0.1,4,6)
+
+plot(x, myopH, xlab="label x", ylab="label y", main="title", col=c(1), xlim=c(0,1), ylim=c(0,3), type="l")
+
+
+
+plot(0,0,type="n",xlab="label x", ylab="label y", main="title", xlim=c(0,1), ylim=c(0,3))
+
+#^dummy plot
+
+#for loop -- ex. solve function over diff values of a
+
+for(i in 1:length(a1)){
+  a <- a1[i]
+  myopH <- myo()
+  lines(x,y,col=c(i)) #put on dummy plot
+}
+
+legend("topright", legend=c(a1),col=c(1:length(a1)),cex=0.8)
+
+
+```
+
+```{r}
+exp = read.csv("/Users/tiffanie/Downloads/bio modeling lab/Experimental_Data.csv")
+
+#^ read in file, become matrix
+
+
+#1st way of dealing w/ matrix
+
+#pull out first column, take info out thru brackets
+#first entry: row, second entry: column
+expPo2 <- exp[,1] #take 1st column + put into variable
+expY <- exp[,2]
+
+plot(exPo2,expY)
+
+
+
+
+#2nd way of dealing w/ matrix -- plot directly
+
+plot(exp[,1],exp[,2]) #1st temp
+plot(exp[,3],exp[,4]) #2nd temp
+
+
+#3rd way: create mini matrices
+#make 7 diff mini matrices for each temperature
+
+
+#ex. 32 deg temp
+temp32 <-data.frame(x=expPo2,y=[expY])
+
+plot(temp32$x,temp32$y)
+
+
+```
+
+
+
+

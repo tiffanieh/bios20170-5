@@ -1,0 +1,331 @@
+---
+title: "BIOS 20170 Actin Lab"
+author: "Tiffanie Huang"
+output: html_document
+date: '2022-02-28'
+---
+
+```{r}
+rm(list=ls())
+
+# part i: read in & plot data for a range of profilin concentrations
+
+# handing experimental data
+profilin=read.csv("/Users/tiffanie/Desktop/actin prelab/Profilin_AssemblyCurves.csv")
+
+# colors
+cl=rainbow(11) 
+
+# plotting data
+plot(profilin[,1],profilin[,2],col=cl[1],xlab="time (s)",ylab="fluor",main="Profilin Curves",type="l")
+
+lines(profilin[,1],profilin[,3],col=cl[2],xlab="time",ylab="p0.5")
+  lines(profilin[,1],profilin[,4],col=cl[3],xlab="time",ylab="p1.0")
+    lines(profilin[,1],profilin[,5],col=cl[4],xlab="time",ylab="p2.0")
+      lines(profilin[,1],profilin[,6],col=cl[5],xlab="time",ylab="p3.0")
+lines(profilin[,1],profilin[,7],col=cl[6],xlab="time",ylab="p4.0")
+  lines(profilin[,1],profilin[,8],col=cl[7],xlab="time",ylab="p5.0")
+    lines(profilin[,1],profilin[,9],col=cl[8],xlab="time",ylab="p7.5")
+      lines(profilin[,1],profilin[,10],col=cl[9],xlab="time",ylab="p10.0")
+lines(profilin[,1],profilin[,11],col=cl[10],xlab="time",ylab="p12.5")
+  lines(profilin[,1],profilin[,12],col=cl[11],xlab="time",ylab="p15.0")
+  
+legend("topleft",legend=c("actin only","p0.5uM","p1.0uM","p2.0uM","p3.0uM","p4.0uM","p5.0uM","p7.5uM","p10.0uM","p12.5uM","p15.0uM"),col=cl,lwd=2)
+
+# for (i in 4:11) {
+# lines(profilin[,i],col=cl[1],xlab="time",ylab="fluor")}
+
+```
+
+```{r}
+# Describe what you see. How do the assembly curves of actin assembly change based on changing the profilin concentration?
+# The curves get progressively less steep as the concentration of profilin increases, showing a decrease in the change of rate of fluorescence. All profilin curves are generally increasing, with the actin only curve (0.0uM profilin) increasing the most. Lower profilin concentrations means the actin has produces more fluorescence, polymerizing faster and assembling actin faster.
+```
+
+
+```{r}
+# part ii: linear portion of experimental curves
+# plotting data
+
+st<-50
+end<-90
+
+plot(profilin[st:end,1],profilin[st:end,2],col=cl[1],xlab="time (s)",ylab="fluor",main="Profilin Elongation Curves",type="l")
+
+lines(profilin[st:end,1],profilin[st:end,3],col=cl[2],xlab="time",ylab="p0.5")
+  lines(profilin[st:end,1],profilin[st:end,4],col=cl[3],xlab="time",ylab="p1.0")
+    lines(profilin[st:end,1],profilin[st:end,5],col=cl[4],xlab="time",ylab="p2.0")
+      lines(profilin[st:end,1],profilin[st:end,6],col=cl[5],xlab="time",ylab="p3.0")
+lines(profilin[st:end,1],profilin[st:end,7],col=cl[6],xlab="time",ylab="p4.0")
+  lines(profilin[st:end,1],profilin[st:end,8],col=cl[7],xlab="time",ylab="p5.0")
+    lines(profilin[st:end,1],profilin[st:end,9],col=cl[8],xlab="time",ylab="p7.5")
+      lines(profilin[st:end,1],profilin[st:end,10],col=cl[9],xlab="time",ylab="p10.0")
+lines(profilin[,1],profilin[,11],col=cl[10],xlab="time",ylab="p12.5")
+  lines(profilin[,1],profilin[,12],col=cl[11],xlab="time",ylab="p15.0")
+  
+legend("topleft",legend=c("actin only","p0.5uM","p1.0uM","p2.0uM","p3.0uM","p4.0uM","p5.0uM","p7.5uM","p10.0uM","p12.5uM","p15.0uM"),col=cl,lwd=1)
+
+```
+
+```{r}
+# Describe what you see.
+# I can see that while all the curves are generally increasing in fluorescence over time, the more concentrated they are, the less of an increase is present. Again, the curve for actin only (0.0uM profilin) displays the highest rate of change in fluorescence production. This shows that the assembly rate during elongation is higher for actin only, and it only slows down as the concentration of profilin is increased. 
+```
+
+```{r}
+#part iii: perform a linear fit to the restricted portion of the experimental data
+
+# chunks correspond to diff parts in the lab
+# index values (start and end) for the linear elongation portion of all 11 curves
+
+st<-50
+end<-90
+
+#linear regression lm (linear model) to extrapolate slope of linear portion for every 11 curves - independently - 11 curves - that were calculated from fitting the data to a line - y=mx+b and you want m
+
+# graph 1
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,2]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,2],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (0.0uM profilin)",col=c(1),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope<-vector()
+  prof_slope[1]<-slope
+  
+# graph 2
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,3]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,3],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (0.5uM profilin)",col=c(2),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[2]<-slope
+  
+# graph 3
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,4]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,4],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (1.0uM profilin)",col=c(3),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[3]<-slope
+  
+# graph 4
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,5]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,5],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (2.0uM profilin)",col=c(4),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[4]<-slope
+  
+# graph 5
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,6]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,6],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (3.0uM profilin)",col=c(5),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[5]<-slope
+  
+# graph 6
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,7]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,7],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (4.0uM profilin)",col=c(6),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[6]<-slope
+  
+# graph 7
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,8]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,8],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (5.0uM profilin)",col=c(7),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[7]<-slope
+  
+# graph 8
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,9]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,9],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (7.5uM profilin)",col=c(8),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[8]<-slope
+  
+# graph 9
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,10]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,10],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (10.0uM profilin)",col=c(9),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[9]<-slope
+  
+# graph 10
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,11]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,11],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (12.5uM profilin)",col=c(10),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[10]<-slope
+  
+# graph 11
+
+  #perform linear fit
+  fit<-lm(profilin[st:end,12]~profilin[st:end,1])
+  slope<-fit$coefficients[2]
+  intercept<-fit$coefficients[1]
+  R2<-summary(fit)$r.squared
+  
+  #plot fluor vs time
+  plot(profilin[st:end,1],profilin[st:end,12],xlab="time (s)",ylab="fluor",main="Profilin Linear Regression (15.0uM profilin)",col=c(11),pch=16)
+  abline(fit)
+  legend("bottomright",bty="n",legend=paste("R2 is",format(summary(fit)$r.squared,digits=4)))
+  
+  #store each individual slope
+  prof_slope[11]<-slope
+  
+#Discuss the trend in R2 for each 11 curves and what this means for the linear fit to the profilin data.
+#R2 decreases as the concentration of each profilin curve increases. In the beginning, with the curves for smaller profilin concentrations, the R2 is is closer to 1.0, meaning that much of the variance in actin polymerization can be predicted by the amount of time passed. As the profilin concentrations increase, the R2 for those curves decrease, meaning less of the variance in actin polymerization can be predicted by time.
+
+# plot slopes (assembly rate of actin in the presence of profilin)
+# number of filaments and the elongation rate - bulk assembly assay vs profilin concentration
+```
+
+```{r}
+#part iv: extract the binding affinity of profilin for g-actin
+
+# nonlinear fit (assembly rate vs profilin concentration)
+#prof<-nls(y~x) # x-axis quadratic expression 
+
+# find the best Kd - that fits the data with least error between nonlinear fit and the experimental data
+
+# plot the data and the fit - extract a Kd. profilin for G-actin
+
+profilin<-c(0,0.5,1,2,3,4,5,7.5,10,12.5,15)
+plot(profilin,prof_slope,xlab=("profilin concentration"),ylab=("assembly rate"),main="assembly rate vs profilin concentration - line",type="l")
+
+profilin<-c(0,0.5,1,2,3,4,5,7.5,10,12.5,15)
+plot(profilin,prof_slope,xlab=("profilin concentration"),ylab=("assembly rate"),main="assembly rate vs profilin concentration - point",pch=16)
+
+#Does the curve look linear? What is the shape of the curve?
+#It does not look linear. The shape is suggestive of exponential decay. The rate of change in assembly rate decreases / becomes less negative as concentration of profilin increases.
+
+#x=(max(prof_slope)+min(prof_slope)-max(prof_slope))*(((kd+2.5+profilin)-sqrt((kd+2.5+profilin)^2-4*2.5*profilin))/(2*2.5))
+
+#nonlinear least squares-r syntax
+kdfit<-nls(prof_slope~(max(prof_slope)+(min(prof_slope)-max(prof_slope))*(((kd+2.5+profilin)-sqrt((kd+2.5+profilin)^2-4*2.5*profilin))/(2*2.5))),start=list(kd=1)) # (nls=nonlinear least squares)
+# where the x-info is the custom quadratic equation and you need to start off the 1 parameter you are trying to optimize w/ an initial value
+
+#best Kd & R2
+p<-coef(summary(kdfit)) # grabs info from solver we need
+kd_est<-p[1] #first coef in solution of nonlinear model is Kd
+goodfit<-cor(prof_slope,predict(kdfit)) #tells you the goodness of your nonlinear model w/ predicated parameters, y=variable on y-axis
+
+#plot nonlinear fit & experimental data
+plot(profilin,prof_slope)
+lines(profilin,predict(kdfit),col="red")
+legend("topright",bty="n",legend=paste("Kd is",format(kd_est,digits=4)))
+legend("topright",bty="n",inset=0.1,legend=paste("Fit is",format(goodfit,digits=4)))
+
+# bty="n" suppresses box; format() to shorten display
+
+#What is the Kd? How good of a fit is this quadratic expression?
+#The Kd is 0.4768, and the fit is 0.9111, which means the quadratic expression is a good fit (>0.9).
+
+#Discuss the affinity of profilin for g-actin (is it strong/weak). What does this mean for the functioning of actin inside a cell?
+#The affinity of profilin for g-actin is strong, meaning the functioning of actin may be inhibited by profilin, as it decreases the rate of polymerization due to how g-actin tends to bind to profilin. When profilin is bound to g-actin, a nucelation factor will be needed to aid actin in its polymerization.
+```
+
+```{r}
+# part v: what does the binding affinity mean?
+
+#fraction of G-actin bound w/ profilin - At = 100, Pt = 100
+gbound1<-(((100+100+0.4768)-sqrt((100+100+0.4768)^2-4*(100*100)))/2)
+percent1<-((93.329215/100)*100)
+
+#The concentration of G-actin bound to profilin is around 93.3292 uM. Around 93.33% of G-actin is bound with profilin out of the total actin, which means that profilin has a strong affinity and effectively binds to actin, preventing the actin from polymerizing into filaments and slowing the rate of change in polymerization. This gives the cell more control over how/when actin filaments form, preventing spontaneous assembly. 
+
+#fraction of G-actin bound w/ profilin - At = 50, Pt = 100
+gbound2<-(((50+100+0.4768)-sqrt((50+100+0.4768)^2-4*(50*100)))/2)
+percent2<-((49.532042/50)*100)
+
+#The concentration of G-actin bound to profilin is around 49.5320 uM.Around 99.06% of G-actin is bound with profilin out of the total actin. With an increase in the ratio of profilin:actin comes an increase in the percentage of G-actin is bound w/ profilin out of the total actin. Again, this means that profilin has a very strong affinity and effectively binds to actin, preventing the actin from polymerizing into filaments and slowing the rate of change in polymerization. This gives the cell more control over how/when actin filaments form, preventing spontaneous assembly.  
+
+#This makes sense now knowing the affinity of profilin for G-actin because it reflects our second calculation, where almost all of the g-actin in the cell is bound to profilin. Because the profilin serves to prevent spontaneous actin assembly into f-actin, allowing it to control when actin filaments polymerizing into F-actin using nucleation factors that will help even the profilin-bound g-actin form actin filaments. This is a reasonable hypothesis, given my results that disply profilin's high affinity for G-actin.
+```

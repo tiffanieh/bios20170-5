@@ -1,0 +1,182 @@
+---
+title: "hemoglobin prelab"
+author: "Tiffanie Huang"
+date: '2022-11-10'
+output: html_document
+---
+
+```{r}
+#Tiffanie Huang -- Hemoglobin Modeling Prelab
+```
+
+```{r}
+#1. I got a hyperbolic curve -- the shape of the curve is one that increases at a decreasing rate.
+
+frMyo <- function(){
+  ypo2 <- po2/(po2+p50)
+  return(ypo2)
+}
+
+p50 <- 35.6
+po2 <- seq(0,100,0.1)
+
+myop50 <- frMyo()
+
+plot(po2, myop50, xlab="PO2 values (mmHg)", ylab="fraction of total myoglobin oxygenated", main="Fraction of total myoglobin oxygenated vs Po2 values (mmHg)", col=c(1), type="l")
+
+```
+
+```{r}
+
+#2. As we increase p50, the saturation curves begin to plateau at a lower value of Po2 -- they shift down, indicating they will not bind as much O2. The curves are still hyperbolic here w/ myoglobin.
+
+frMyo <- function(po2, p50){
+  ypo2 <- po2/(po2+p50)
+  return(ypo2)
+}
+
+
+
+
+p50_1 <- seq(20,40,5)
+po2_1 <- seq(0,1000,0.1)
+
+
+
+plot(0,0,type="n",xlim=c(0,1000),ylim=c(0,1),xlab="PO2 values (mmHg)", ylab="fraction of total myoglobin oxygenated", main="Fraction of total myoglobin oxygenated vs Po2 values (mmHg) for different p50 values")
+abline(h=0.5, lty=2)
+
+
+for(i in 1:length(p50_1)){
+  myop50 <- frMyo(po2_1, p50_1[i])
+  lines(po2_1,myop50,col=c(i)) #put on dummy plot
+}
+
+legend("topright", legend=c(p50_1),fill=c(1:length(p50_1)),title="p50")
+
+
+```
+
+```{r}
+exp = read.csv("/Users/tiffanie/Downloads/bio modeling lab/Experimental_Data.csv")
+temp = read.csv("/Users/tiffanie/Downloads/bio modeling lab/Temp_data_ExpF22.csv")
+
+```
+
+```{r}
+#Technique I
+exp_po2 <- exp$data_pO2 
+exp_y <- exp$data_Y
+
+t_po2_32 <- temp$data_pO2_32
+t_y_32 <- temp$data_Y_32
+t_po2_35 <- temp$data_pO2_35
+t_y_35 <- temp$data_Y_35
+t_po2_38 <- temp$data_pO2_38
+t_y_38 <- temp$data_Y_38
+t_po2_41 <- temp$data_pO2_41
+t_y_41 <- temp$data_Y_41
+t_po2_44 <- temp$data_pO2_44
+t_y_44 <- temp$data_Y_44
+t_po2_47 <- temp$data_pO2_47
+t_y_47 <- temp$data_Y_47
+t_po2_52 <- temp$data_pO2_52
+t_y_52 <- temp$data_Y_52
+
+#Technique II (method 2)
+exp_data <- data.frame(x=exp_po2, y=exp_y)
+t32 <- data.frame(x=t_po2_32, y=t_y_32)
+t35 <- data.frame(x=t_po2_35, y=t_y_35)
+t38 <- data.frame(x=t_po2_38, y=t_y_38)
+t41 <- data.frame(x=t_po2_41, y=t_y_41)
+t44 <- data.frame(x=t_po2_44, y=t_y_44)
+t47 <- data.frame(x=t_po2_47, y=t_y_47)
+t52 <- data.frame(x=t_po2_52, y=t_y_52)
+
+#Technique III: take out rows/columns directly from original matrix
+
+
+```
+
+```{r}
+#3. plots for experimental + temp sensitive data
+```
+
+```{r}
+#Exp
+#Technique I
+
+plot(exp_po2,exp_y, xlab="Po2 values (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs po2 values", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+abline(h=50, lty=2)
+legend("bottomright", legend=c("po2 curve"), col=c(1), cex=0.8)
+```
+
+```{r}
+#Technique II
+
+plot(exp_data, xlab="Po2 values (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs po2 values", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+abline(h=50, lty=2)
+legend("bottomright", legend=c("po2 curve"), col=c(1), cex=0.8)
+```
+
+```{r}
+#Technique III
+
+plot(exp[,1],exp[,2], xlab="Po2 values (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs po2 values", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+abline(h=50, lty=2)
+
+legend("bottomright", legend=c("po2 curve"), col=c(1), cex=0.8)
+
+```
+
+```{r}
+#Temp
+#Technique I
+
+plot(t_po2_32,t_y_32, xlab="po2 (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs Po2 values for different temp", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+lines(t_po2_35,t_y_35, col=c(2))
+lines(t_po2_38,t_y_38, col=c(3))
+lines(t_po2_41,t_y_41, col=c(4))
+lines(t_po2_44,t_y_44, col=c(5))
+lines(t_po2_47,t_y_47, col=c(6))
+lines(t_po2_52,t_y_52, col=c(7))
+abline(h=50, lty=2)
+
+legend("bottomright", legend=c("32 deg", "35 deg", "38 deg", "41 deg", "44 deg", "47 deg", "52 deg" ), fill=c(1:7), cex=0.8, title="temp")
+```
+
+```{r}
+#Technique II
+
+plot(t32, xlab="po2 (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs Po2 values for different temp", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+lines(t35, col=c(2))
+lines(t38, col=c(3))
+lines(t41, col=c(4))
+lines(t44, col=c(5))
+lines(t47, col=c(6))
+lines(t52, col=c(7))
+abline(h=50,lty=2)
+
+legend("bottomright", legend=c("32 deg", "35 deg", "38 deg", "41 deg", "44 deg", "47 deg", "52 deg" ), fill=c(1:7), cex=0.8, title="temp")
+```
+
+```{r}
+#Technique III
+
+plot(temp[,1],temp[,2], xlab="po2 (mmHg)", ylab="% hemoglobin bound", main="% hemoglobin bound vs Po2 values for different temp", col=c(1), type="l", xlim=c(0,120), ylim=c(0,100))
+lines(temp[,3],temp[,4],col=c(2))
+lines(temp[,5],temp[,6],col=c(3))
+lines(temp[,7],temp[,8],col=c(4))
+lines(temp[,9],temp[,10],col=c(5))
+lines(temp[,11],temp[,12],col=c(6))
+lines(temp[,13],temp[,14],col=c(7))
+abline(h=50, lty=2)
+
+legend("bottomright", legend=c("32 deg", "35 deg", "38 deg", "41 deg", "44 deg", "47 deg", "52 deg" ), fill=c(1:7), cex=0.8, title="temp")
+```
+
+```{r}
+#4. All curves are sigmoidal here, which makes sense given initial cooperativity of hemoglobin before it hits its limit. As temperature increases, we generally see the arch of each sigmoidal curve shift downwards, meaning they approach their plateau at a lower po2 value faster the higher the temperature (with the exception of the 47 deg temp curve, where it is an outlier in it far exceeds the other curves despite being at a relatively high temperature). Generally, % hemoglobin bound decreases with an increase in temperature, meaning there is a lower affinity for oxygen -- when an organism needs more oxygen, more hemoglobin is released to let the O2 be used. 
+
+#We can see at the horizontal line that at 50% hemoglobin bound, the po2 value for each temperature varies; as temperature increases the po2 required for 50% hemoglobin increases, with the 52 degree curve requiring ~58 mmHg where as at 32 degrees, only ~40 mmHg is required to reach 50% hemoglobin binding. 
+```

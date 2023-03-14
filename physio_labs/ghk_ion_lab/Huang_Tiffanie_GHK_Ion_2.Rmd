@@ -1,0 +1,88 @@
+---
+title: "GHK Ion Lab Pt 2"
+author: "Tiffanie Huang"
+date: '2022-10-06'
+output: html_document
+---
+
+```{r}
+endtime <- 50
+ionch <- function(x){
+  state <-rep(0,x)
+  for (t in 1:x) {
+  
+  randNum <- runif(x)
+  if (randNum[t]< 0.5) {
+    state[t] <- 1 #open is 1
+  }
+  #closed is 0
+  }
+  result <- state
+  print(result)
+}
+
+ionch(endtime)
+mean(ionch(endtime))
+
+x <- 1:100
+y <- ionch(100)
+avg <- mean(y)
+plot(x,y, type="l", xlab="time channel is open", ylab="state of channel", main="state of channel vs time")
+abline(h=avg, col="blue")
+
+
+#The average value is 0.48, which is around 0.5.
+
+y2 <- ionch(1000)
+mean(y2)
+
+#now the average is 0.507.
+
+#16. both oscillate sometimes and have basically 2 outcomes, but the plot on the lab looks different from mine in that while mine oscillates much more,  the one illustrated in the lab looks like it stays in one state for a while before switching to another. It seems to favor being closed for longer as well (whereas mine is around 1:1 for open and closed).
+
+#17. No -- we have left out that the channel may remain closed for longer periods because once it's open for long enough/enough diffusion has occurred for the necessary ions, it can remain closed for a while. We did not take into account the previous state when deicidng the next state -- they are simply independent random events.
+
+```
+
+
+```{r}
+
+
+ionch2 <- function(x, CURstate){
+  state<-rep(0,x)
+for(t in 1:x){
+  randomNum<-runif(1)  #runif(1) randomly generates a number between 0 and 1   
+  if(CURstate==0){
+    if(randomNum < .1){
+      CURstate <- 1
+    }else{
+      CURstate <- 0
+    }
+  }else{
+    if(randomNum < .4){
+      CURstate<-0
+    }else{
+      CURstate<-1 
+    }
+  }
+  state[t]<-CURstate
+}
+result <- state
+print(result)
+}
+
+ionch2(100,1)
+
+
+
+y3 <- ionch2(100,1)
+avg2 <- mean(y3)
+plot(x, y3, xlab = "time", ylab="state of channel", main="state of channel over time", type="l")
+abline(h=avg2, col=c(2), lty=2)
+
+#18.It worked best if my Pr[C|C] was much greater than Pr[O|C], while my Pr[O|O] was slightly greater than Pr[C|O]. For both states, the probability that they retain that current state should be higher than changing but for closed channel there should be a much higher probability of retaining the state than for open channels.
+
+
+#19. There should be a limit on how long the channel stays open or closed. In addition, they should involve how many stimulus molec are present in order to decide if a channel should open, as well as how long it would remain open.
+
+```

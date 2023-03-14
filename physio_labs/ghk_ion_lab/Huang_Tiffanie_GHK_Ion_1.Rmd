@@ -1,0 +1,138 @@
+---
+title: "GHK Ion Lab Part 1"
+author: "Tiffanie Huang"
+date: '2022-10-06'
+output: html_document
+---
+
+```{r}
+
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+ghk <- function(PNa, PK, PCl, Na0, K0, Cl0, Nai, Ki, Cli){
+  Erev <- ((R*Temp)/Fa)*log((((PNa*Na0)+(PK*K0)+(PCl*Cli))/((PNa*Nai)+(PK*Ki)+(PCl*Cl0))))
+  return(Erev)
+}
+ghk(100,20,5,460,10,540,50,400,100)
+
+
+#8. The membrane potential became more positive from -0.0594654 V to 0.02911415 V -- it is is depolarized compared to the resting potential. When sodium permeability increases, we get more sodium ions flowing across the concentration gradient from outside the cell to inside --> more positive because there will be more positive particles in the cell, making the membrane potential more positive than before and more closer to sodium's equilibrium potential.
+```
+
+
+```{r}
+
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+ghk <- function(PNa, PK, PCl, Na0, K0, Cl0, Nai, Ki, Cli){
+  Erev <- ((R*Temp)/Fa)*log((((PNa*Na0)+(PK*K0)+(PCl*Cli))/((PNa*Nai)+(PK*Ki)+(PCl*Cl0))))
+  return(Erev)
+}
+ghk(1,100,5,460,10,540,50,400,100)
+
+
+#9. This afterhyperpolarization potential is more negative than the resting membrane potential. It is more hyperpolarized, going from -0.0594654 to -0.08232597 V. As potassium permeability increases, potassium ions will flow along the concentration gradient from inside to outside the cell, resulting in a more negative membrane potential.
+
+```
+
+
+```{r}
+Kperm <- seq(10,1000,10)
+ghk(1,Kperm,5,460,10,540,50,400,100)
+mempot <- ghk(1,Kperm,5,460,10,540,50,400,100)
+plot(Kperm, mempot, xlab="K+ permeability", ylab="membrane potential(V)", main="Membrane potential vs K+ permeability")
+
+
+#10. The membrane potential decreases as K+ permeability is increased, and the rate of change decreases and seems to approach -0.097 V. The rate of change in membrane potential also decreases as K+ permeability increases.
+
+#11. Given that the nernst potential for K+ is -98.523 mV, we can observe that the membrane potential is slowly reaching the equilibrium potential as it approaches -0.097 V. 
+```
+
+
+```{r}
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+ghk <- function(PNa, PK, PCl, Na0, K0, Cl0, Nai, Ki, Cli){
+  Erev <- ((R*Temp)/Fa)*log((((PNa*Na0)+(PK*K0)+(PCl*Cli))/((PNa*Nai)+(PK*Ki)+(PCl*Cl0))))
+  return(Erev)
+}
+ghk(100,81,5,460,10,540,50,400,100)
+
+
+#12. It becomes more positive / it is more depolarized. It went from -0.0594654 to 0.004416075. It is because the Nernst potential for K+ is more similar to resting membrane potential (both are more negative) compared to Na+ which is farther and much more postiive so that when Na+ becomes more permeable, it has a larger effect and will still make the membrane potential more positive.
+
+
+```
+
+
+
+
+```{r}
+
+extKconc <- seq(1,1000,1)
+
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+ghk <- function(PNa, PK, PCl, Na0, K0, Cl0, Nai, Ki, Cli){
+  Erev <- ((R*Temp)/Fa)*log((((PNa*Na0)+(PK*K0)+(PCl*Cli))/((PNa*Nai)+(PK*Ki)+(PCl*Cl0))))
+  return(Erev)
+}
+ghk(1,20,5,460,extKconc,540,50,400,100)
+mempot <- ghk(1,20,5,460,extKconc,540,50,400,100)
+
+
+
+plot(extKconc, mempot, xlab="external K+ concentration (mM)", ylab="membrane potential(V)", main="Membrane potential vs external K+ concentration")
+
+plot(extKconc, mempot, xlab="log of external K+ concentration (mM)", log="x",ylab="membrane potential(V)", main="Membrane potential vs log external K+ concentration")
+
+
+#13. The first graph is increasing at a decreasing rate. The second is also increasing as K+ external concentration increases. The membrane potential generally increases as you increase external K+ concentration -- there are more K+ ions trying to diffuse across the membrane to the inside, which would make it more positive. When external K+ is decreased, membrane potential generally decreases as not that many K+ ions are trying to diffuse through the membrane. When K+ is decreased 10 fold from 1000mM to mM, the membrane potential decreases from about 0.02 V to -0.04. From 10 mM to 1 mM, it decreases from about -0.06 to around -0.02. External K+ concentration increases --> Concentration gradient for K+ decreases --> equilibrium potential of K+ not pulling the membrane potential closer to negative anymore --> membrane potential increases --> positive direction
+
+```
+
+```{r}
+
+#14. The Nernst equation just involves one ion while the GHK equation involves all 3 ions. GHK equation involves permeability as well.
+
+R <- 8.314
+Fa <- 96500
+Temp <- 310
+  
+nernst <- function(K0, Ki){
+  Ek <- ((R*Temp)/Fa)*log(K0/Ki)
+  return(Ek)
+}
+extKconc <- seq(1,1000,1)
+nernst(extKconc, 400)
+nmempot <- nernst(extKconc, 400)
+
+plot(extKconc, nmempot, xlab="External potassium concentration mM", ylab="Nernst potential mV", main="Change in potassium concentration", type="l",col=c(1))
+points(extKconc, mempot, xlab="external K+ concentration (mM)",ylab="membrane potential(V)", main="Membrane potential vs  external K+ concentration", type="l",col=c(2))
+legend("topleft",legend=c("GHK","Nernst"),fill=c(1,2), lwd=1, cex = 0.5)
+
+
+#log
+plot(extKconc, nmempot, xlab="log of External potassium concentration mM", ylab="Nernst potential V", log="x",main="Log Change in potassium concentration", type="l",col=c(3))
+points(extKconc, mempot, xlab="log of external K+ concentration (mM)",ylab="membrane potential(V)", log="x",main="Membrane potential vs log external K+ concentration", type="l",col=c(4))
+legend("topleft",legend=c("GHK","Nernst"),fill=c(3,4), lwd=1, cex = 0.5)
+
+#15. Both membrane potential and nernst potential are increasing with increasing K+ external concentration. At low k+ concentrations the membrane potential deviates from Nernst potential b/c once K+ is low enough, the other ions may impact membrane potential more than K+.
+
+```
+
+
+
+
+
+
+
+

@@ -1,0 +1,89 @@
+---
+title: "actin prelab notes"
+output: html_document
+date: '2022-02-28'
+---
+
+```{r}
+rm(list=ls())
+
+#define single values for parameters
+a<-3
+b<-20
+c<-1
+
+#create arrays for parameters
+#(start,end,step)
+a<-seq(0,3,0.1)
+
+#or you can fill an array with specific values
+a<-c(0,2,1.3)
+```
+
+```{r}
+#read in data files
+
+#simplest to put your .csv file in the same folder/directory as your .RMD file - then you have to read in the name of the file instead of defining the working directory
+
+test=read.csv("test.csv")
+
+#Access data to plot
+#1 assign each column to variable
+
+x1=test$Time
+y1=test$ActinOnly
+
+plot(x1,y1,xlab="label x",ylab="label y",main="title",type="l",col=c(1))
+
+```
+
+
+```{r}
+#2 Mini matrix
+
+mini <- data.frame(x=test[,1],y=test[,2])
+
+plot(mini$x,mini$y,xlab="label x",ylab="label y",main="title",type="l",col=c(2))
+```
+
+```{r}
+#3 work with original matrix
+
+plot(test[,1],test[,2],xlab="label x",ylab="label y", main="title",type="l",col=c(3))
+
+# best if no data manipulation before plotting
+
+```
+```{r}
+# plot only part of the data in your data set
+
+st<-2
+end<-4
+
+plot(x1[st:end],y1[st:end],xlab="label x",ylab="label y", main="title",type="l",col=c(4))
+
+
+
+```
+
+```{r}
+#linear fits
+
+fit<- lm(y1~x1)
+intercept <- fit$coefficents[[1]]
+slope <- fit$coefficients[[2]]
+
+#extract r^2 value
+R2 <- summary(fit)$r.squared
+
+#plot data first, then plot regression line on top
+plot(x1,y1,xlab="label x",ylab="label y",main="title",col=c(1))
+abline(fit,col=c(2))
+
+
+legend("topleft",bty="n",legend=paste("Slope is",format(slope,digits=4)))
+legend("topleft",bty="n",legend=paste("yint is",format(intercept,digits=4)),inset=0.1) #push to right 0.1
+legend("bottomleft",bty="n",legend=paste("R2 is",format(R2,digits=4)))
+```
+
+
